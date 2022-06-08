@@ -1,6 +1,13 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-import router from './router'
-import store from './store'
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router';
+import store from './store';
+import BaseLoader from '@/components/BaseLoader.vue';
 
-createApp(App).use(store).use(router).mount('#app')
+const app = createApp(App);
+app.use(store);
+app.use(router);
+
+app.component('base-loader', BaseLoader);
+
+app.mount('#app');

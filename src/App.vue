@@ -1,30 +1,56 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <the-header></the-header>
+  <transition name="route" mode="out-in">
+    <router-view/>
+  </transition>
+  <the-footer></the-footer>
 </template>
 
+<script>
+import { mapMutations, mapActions } from 'vuex';
+import TheHeader from '@/components/TheHeader.vue';
+import TheFooter from '@/components/TheFooter.vue';
+
+export default {
+  components: { TheHeader, TheFooter },
+  created() {
+    const userAccessKey = localStorage.getItem('userAccessKey');
+    if (userAccessKey) {
+      // this.$store.commit('updateAccessKey');
+      this.updateAccessKey(userAccessKey);
+    }
+    // this.$store.dispatch('loadCart');
+    this.loadCart();
+  },
+  methods: {
+    ...mapActions(['loadCart']),
+    ...mapMutations(['updateAccessKey'])
+  }
+}
+</script>
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+.route-enter-from {
+  opacity: 0;
+  transform: translateY(-30px);
 }
 
-nav {
-  padding: 30px;
+.route-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
 }
 
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
+.route-enter-active {
+  transition: all 0.3s ease-out;
 }
 
-nav a.router-link-exact-active {
-  color: #42b983;
+.route-leave-active {
+  transition: all 0.3s ease-in;
+}
+
+.route-enter-to,
+.route-leave-from {
+  opacity: 1;
+  transform: translateY(0);
 }
 </style>
