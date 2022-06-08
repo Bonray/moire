@@ -1,8 +1,10 @@
 <template>
   <the-header></the-header>
-  <transition name="route" mode="out-in">
-    <router-view/>
-  </transition>
+  <router-view v-slot="{ Component }">
+    <transition name="route" mode="out-in">
+      <component :is="Component"></component>
+    </transition>
+  </router-view>
   <the-footer></the-footer>
 </template>
 
