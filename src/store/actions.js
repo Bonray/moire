@@ -21,7 +21,7 @@ export default {
     context.state.areFiltersLoadingFailed = false;
     try {
       const categoriesData = await axios.get(`${ API_URL }/productCategories`);
-      context.commit('setCategories', categoriesData.items);
+      context.commit('setCategories', categoriesData.data.items);
       const colorsData = await axios.get(`${ API_URL }/colors`);
       context.commit('setColors', colorsData.data.items);
       const materialsData = await axios.get(`${ API_URL }/materials`);
@@ -38,13 +38,31 @@ export default {
     const { data } = await axios.get(`${ API_URL }/deliveries`);
     context.commit('setDeliveries', data);
   },
-  async loadPayments(context) {
-    const { data } = await axios.get(`${ API_URL }/payments`, { params: { deliveryTypeId: 1 }});
-    context.commit('setPayments', data);
+  async loadPayments(context, payload) {
+    context.state.isLoading = true;
+    context.state.isLoadingFailed = false;
+    try {
+      const { data } = await axios.get(`${ API_URL }/payments`, { params: payload });
+      context.commit('setPayments', data);
+    } catch(err) {
+      context.state.isLoadingFailed = true;
+    } finally {
+      context.state.isLoading = false;
+    }
   },
   async addToCart(context, payload) {
-    const { data } = await axios.post(`${ API_URL }/baskets/products`, payload, { params: { userAccessKey: context.state.userAccessKey } });
-    context.commit('updateCart', data.items);
+    context.state.isSending = true;
+    context.state.isSendingFailed = false;
+    context.state.isAdded = false;
+    try {
+      const { data } = await axios.post(`${ API_URL }/baskets/products`, payload, { params: { userAccessKey: context.state.userAccessKey } });
+      context.commit('updateCart', data.items);
+      context.commit('syncCartProducts');
+    } catch(err) {
+      context.state.isSendingFailed = true;
+    }
+    context.state.isSending = false;
+    context.state.isAdded = true;
   },
   async loadCart(context) {
     context.state.isCartLoading = true;
@@ -56,26 +74,24 @@ export default {
         context.commit('updateAccessKey', data.user.accessKey);
       }
       context.commit('updateCart', data.items);
+      context.commit('syncCartProducts');
     } catch(err) {
       context.state.isCartLoadingFailed = true;
     } finally {
       context.state.isCartLoading = false;
     }
   },
-  async updateProductQuantity(context, payload) {
+  async deleteFromCart(context, payload) {
+    context.commit('deleteCartProduct', { productId: payload.productId });
     try {
-      const { data } = await axios.put(`${ API_URL }/baskets/products`, payload, { params: { userAccessKey: context.state.userAccessKey }});
+      const { data } = await axios.delete(`${ API_URL }/baskets/products`, {
+        params: { userAccessKey: context.state.userAccessKey },
+        data: payload
+      });
       context.commit('updateCart', data.items);
     } catch(err) {
-      console.error(err);
+      context.commit('syncCartProducts');
     }
-  },
-  async deleteFromCart(context, payload) {
-    const { data } = await axios.delete(`${ API_URL }/baskets/productss`, {
-      params: { userAccessKey: context.state.userAccessKey },
-      data: payload
-    });
-    context.commit('updateCart', data.items);
   },
   async sendOrder(context, payload) {
     context.state.isSending = true;

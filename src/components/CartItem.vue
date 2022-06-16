@@ -24,8 +24,7 @@
     </b>
 
     <div class="product__status">
-      <base-loader :size="'loader--small'" v-if="isSending"></base-loader>
-      <span class="product__error" v-else-if="isSendingFailed">Произошла ошибка при удалении товара из корзины. Попробуйте позже!</span>
+      <span class="product__error" v-if="isSendingFailed">Что-то пошло не так. Попробуйте позже!</span>
     </div>
 
     <button class="product__del button-del" type="button" aria-label="Удалить товар из корзины" @click.prevent="deleteItem">
@@ -56,20 +55,18 @@ export default {
         return this.amount;
       },
       async set(val) {
-        this.isSending = true;
         this.isSendingFailed = false;
+        this.$store.commit('updateCartProductQuantity', { productId: this.itemId, quantity: val });
         try {
-          const { data } = await axios.put(`${ API_URL }/baskets/products`, {
-            basketItemId: this.basketItemId,
-            quantity: val,
-          },
-          { params: { userAccessKey: this.$store.state.userAccessKey }});
+          const { data } = await axios.put(`${ API_URL }/baskets/products`,
+            { basketItemId: this.basketItemId, quantity: val },
+            { params: { userAccessKey: this.$store.state.userAccessKey }
+          });
           this.$store.commit('updateCart', data.items);
         } catch(err) {
           this.isSendingFailed = true;
-        } finally {
-          this.isSending = false;
-        }
+          this.$store.commit('syncCartProducts');
+    }
       }
     },
   },
@@ -77,20 +74,8 @@ export default {
     setItemAmount(val) {
       this.productAmount = val;
     },
-    async deleteItem() {
-      this.isSending = true;
-      this.isSendingFailed = false;
-      try {
-        const { data } = await axios.delete(`${ API_URL }/baskets/products`, {
-          params: { userAccessKey: this.$store.state.userAccessKey },
-          data: { basketItemId: this.basketItemId }
-        });
-        this.$store.commit('updateCart', data.items);
-      } catch(err) {
-        this.isSendingFailed = true;
-      } finally {
-        this.isSending = false;
-      }
+    deleteItem() {
+      this.$store.dispatch('deleteFromCart', { basketItemId: this.basketItemId, productId: this.itemId });
     },
   }
 }

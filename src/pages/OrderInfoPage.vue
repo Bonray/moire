@@ -94,7 +94,7 @@
           </ul>
           
           <div class="cart__total">
-            <p>Доставка: <b>{{ +orderInfo.deliveryType.price ? orderInfo.deliveryType.price : 'бесплатно' }} ₽</b></p>
+            <p>Доставка: <b>{{ +orderInfo.deliveryType.price ? `${ orderInfo.deliveryType.price } ₽` : 'бесплатно' }}</b></p>
             <p>Итого: <b>{{ orderInfo.basket.items.length }}</b> товара на сумму <b>{{ orderInfo.totalPrice }} ₽</b></p>
           </div>
         </div>
@@ -107,7 +107,7 @@
 export default {
   computed: {
     orderInfo() {
-      return this.$store.getters.orderInfo;
+      return this.$store.state.orderInfo;
     },
     isLoading() {
       return this.$store.state.isLoading;

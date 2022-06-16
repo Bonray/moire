@@ -2,6 +2,9 @@ export default {
   setProducts(state, payload) {
     state.productsData = payload;
   },
+  setProductData(state, payload) {
+    state.productData = payload;
+  },
   setCategories(state, payload) {
     state.categoriesData = payload;
   },
@@ -23,10 +26,24 @@ export default {
   updateAccessKey(state, payload) {
     state.userAccessKey = payload;
   },
+  syncCartProducts(state) {
+    state.cartData = state.cartProductsData.map((item) => ({
+      productId: item.product.id,
+      quantity: item.quantity
+    }));
+  },
   updateCart(state, payload) {
-    state.cartData = payload;
+    state.cartProductsData = payload;
+  },
+  updateCartProductQuantity(state, payload) {
+    const item = state.cartData.find((cartItem) => cartItem.productId === payload.productId);
+    if (item) item.quantity = payload.quantity;
+  },
+  deleteCartProduct(state, payload) {
+    state.cartData = state.cartData.filter((item) => item.productId !== payload.productId);
   },
   resetCart(state) {
+    state.cartProductsData = [];
     state.cartData = [];
   },
   updateOrderInfo(state, payload) {

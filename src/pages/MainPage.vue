@@ -13,7 +13,7 @@
     </div>
 
     <div class="content__catalog">
-      <products-filter @change-filters="setFilters"></products-filter>
+      <products-filter :filters="filters" @change-filters="setFilters"></products-filter>
 
       <section class="catalog">
         <div class="loader-wrapper" v-if="isLoading">
@@ -52,7 +52,7 @@ export default {
   },
   computed: {
     productsData() {
-      return this.$store.getters.products;
+      return this.$store.state.productsData;
     },
     products() {
       return this.productsData ? this.productsData.items.map((product) => {
@@ -99,9 +99,13 @@ export default {
     },
     page() {
       this.loadProducts();
+    },
+    '$route'() {
+      this.loadProducts();
     }
   },
   created() {
+    this.$route.query.categoryId ? this.filters.filterCategoryId = this.$route.query.categoryId : 0;
     this.loadProducts();
   }
 }

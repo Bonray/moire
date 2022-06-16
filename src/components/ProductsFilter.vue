@@ -77,7 +77,7 @@
       <button class="filter__submit button button--primery" type="submit">
         Применить
       </button>
-      <button class="filter__reset button button--second" type="button" @click="resetFilters">
+      <button class="filter__reset button button--second" type="button" @click="resetFilters" v-if="isResetBtnVisible">
         Сбросить
       </button>
     </form>
@@ -87,30 +87,31 @@
 <script>
 export default {
   emits: ['change-filters'],
+  props: ['filters'],
   data() {
     return {
-      currentPriceFrom: 0,
-      currentPriceTo: 0,
-      currentCategoryId: 0,
-      currentColorId: [],
-      currentMaterialId: [],
-      currentSeasonId: []
+      currentPriceFrom: this.filters.filterPriceFrom,
+      currentPriceTo: this.filters.filterPriceTo,
+      currentCategoryId: this.filters.filterCategoryId,
+      currentColorId: this.filters.filterColorId,
+      currentMaterialId: this.filters.filterMaterialId,
+      currentSeasonId: this.filters.filterSeasonId
     }
   },
   computed: {
     colors() {
-      return this.$store.getters.colors;
+      return this.$store.state.colorsData;
     },
     materials() {
-      return this.$store.getters.materials;
+      return this.$store.state.materialsData;
     },
     seasons() {
-      return this.$store.getters.seasons;
+      return this.$store.state.seasonsData;
     },
     categories() {
-      return this.$store.getters.categories;
+      return this.$store.state.categoriesData;
     },
-    filters() {
+    productFilters() {
       return {
         filterPriceFrom: this.currentPriceFrom,
         filterPriceTo: this.currentPriceTo,
@@ -126,13 +127,21 @@ export default {
     isLoadingFailed() {
       return this.$store.state.areFiltersLoadingFailed;
     },
+    isResetBtnVisible() {
+      return this.filters.filterPriceFrom
+        || this.filters.filterPriceTo
+        || this.filters.filterCategoryId
+        || this.filters.filterColorId.length
+        || this.filters.filterMaterialId.length
+        || this.filters.filterSeasonId.length
+    }
   },
   methods: {
     async loadFilters() {
       this.$store.dispatch('loadFilters');
     },
     setFilters() {
-      this.$emit('change-filters', this.filters);
+      this.$emit('change-filters', this.productFilters);
     },
     resetFilters() {
       this.currentPriceFrom = 0;
@@ -141,6 +150,7 @@ export default {
       this.currentColorId = [];
       this.currentMaterialId = [];
       this.currentSeasonId = [];
+      this.$router.replace({'query': null});
       this.setFilters();
     }
   },

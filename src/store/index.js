@@ -6,6 +6,7 @@ import actions from './actions.js';
 export default createStore({
   state: {
     productsData: null,
+    productData: null,
     categoriesData: null,
     colorsData: null,
     materialsData: null,
@@ -20,6 +21,7 @@ export default createStore({
     isSending: false,
     isSendingFailed: false,
     cartData: [],
+    cartProductsData: [],
     cartError: null,
     isCartLoading: false,
     isCartLoadingFailed: false,

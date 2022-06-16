@@ -16,7 +16,7 @@
           </router-link>
         </li>
         <li class="breadcrumbs__item">
-          <router-link class="breadcrumbs__link" :to="{ name: 'main' }">
+          <router-link class="breadcrumbs__link" :to="{ name: 'main', query: { 'categoryId': product.category.id } }">
             {{ product.category.title }}
           </router-link>
         </li>
@@ -143,7 +143,7 @@ export default {
       isLoadingFailed: false,
       isSending: false,
       isSendingFailed: false,
-      isAdded:false,
+      isAdded: false,
       productData: null,
       activeColorIdx: 0,
       activeSizeIdx: 0,
@@ -215,7 +215,6 @@ export default {
           quantity: this.productAmount
         });
       } catch(err) {
-        console.error(err);
         this.isSendingFailed = true;
       }
       this.isSending = false;

@@ -1,6 +1,6 @@
 <template>
   <div class="form__counter" :class="{ product__counter : $route.name === 'cart' }">
-    <button type="button" aria-label="Убрать один товар" @click="changeItemAmount(itemAmount - 1)">
+    <button type="button" aria-label="Убрать один товар" :disabled="itemAmount === 1" @click="changeItemAmount(itemAmount - 1)">
       <svg width="12" height="12" fill="currentColor">
         <use xlink:href="#icon-minus"></use>
       </svg>

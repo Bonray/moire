@@ -44,7 +44,15 @@
             <base-form-textarea title="Комментарии к заказу" placeholder="Ваши пожелания" :error="formError.comments" v-model="formData.comments"></base-form-textarea>
           </div>
 
-          <div class="cart__options">
+          <div class="cart__options" v-if="isLoading">
+            <div class="loader-wrapper">
+              <base-loader></base-loader>
+            </div>
+          </div>
+          <div class="cart__options" v-else-if="isLoadingFailed">
+            <h2>Возникла ошибка при загрузке товаров. Попробуйте позже.</h2>
+          </div>
+          <div class="cart__options" v-else>
             <h3 class="cart__title">Доставка</h3>
             <ul class="cart__options options">
               <base-form-radio-delivery v-for="delivery in deliveries" :key="delivery.id" group="delivery" :value="delivery.id" :title="delivery.title" :price="delivery.price" v-model="formData.deliveryId"></base-form-radio-delivery>
@@ -73,7 +81,7 @@
             <p>Итого: <b>{{ totalQuantity }}</b> товара на сумму <b>{{ totalPrice }} ₽</b></p>
           </div>
 
-          <button class="cart__button button button--primery" type="submit">
+          <button class="cart__button button button--primery" type="submit" :disabled="isLoading || isLoadingFailed">
             Оформить заказ
           </button>
         </div>
@@ -111,7 +119,7 @@ export default {
   },
   computed: {
     cart() {
-      return this.$store.getters.cart;
+      return this.$store.state.cartProductsData;
     },
     totalPrice() {
       return this.$store.getters.cartTotalPrice + this.deliveryPrice;
@@ -120,50 +128,61 @@ export default {
       return this.$store.getters.cartTotalQuantity;
     },
     payments() {
-      return this.$store.getters.payments;
+      return this.$store.state.paymentsData;
     },
     deliveries() {
-      return this.$store.getters.deliveries;
+      return this.$store.state.deliveriesData;
     },
     deliveryPrice() {
       return this.deliveries ? +this.deliveries.find(delivery => delivery.id === this.formData.deliveryId).price : 0;
     },
     formError() {
-      return this.$store.getters.formErrorInfo || {};
+      return this.$store.state.orderErrorInfo || {};
     },
     formErrorMessage() {
-      return this.$store.getters.formErrorMessage;
+      return this.$store.state.formErrorMessage;
     },
     orderErrorMessage() {
-      return this.$store.getters.orderErrorMessage;
+      return this.$store.state.orderErrorMessage;
     },
     isSending() {
       return this.$store.state.isSending;
     },
     isSendingFailed() {
       return this.$store.state.isSendingFailed;
-    }
+    },
+    isLoading() {
+      return this.$store.state.isLoading;
+    },
+    isLoadingFailed() {
+      return this.$store.state.isLoadingFailed;
+    },
   },
   methods: {
-    async sendOrder() {
-      try {
-        await this.$store.dispatch('sendOrder', {
-          name: this.formData.name,
-          address: this.formData.address,
-          phone: this.formData.phone,
-          email: this.formData.email,
-          deliveryTypeId: this.formData.deliveryId,
-          paymentTypeId: this.formData.paymentId,
-          comments: this.formData.comments
-        });
-      } catch(err) {
-        console.error(err);
-      }
+    sendOrder() {
+      this.$store.dispatch('sendOrder', {
+        name: this.formData.name,
+        address: this.formData.address,
+        phone: this.formData.phone,
+        email: this.formData.email,
+        deliveryTypeId: this.formData.deliveryId,
+        paymentTypeId: this.formData.paymentId,
+        comments: this.formData.comments
+      });
+    },
+    loadPayments() {
+      this.$store.dispatch('loadPayments', { deliveryTypeId: this.formData.deliveryId });
+    }
+  },
+  watch: {
+    'formData.deliveryId'() {
+      this.loadPayments();
+      this.formData.paymentId = null;
     }
   },
   created() {
     this.$store.dispatch('loadDeliveries');
-    this.$store.dispatch('loadPayments');
+    this.loadPayments();
   }
 }
 </script>
