@@ -128,12 +128,7 @@ export default {
       return this.$store.state.areFiltersLoadingFailed;
     },
     isResetBtnVisible() {
-      return this.filters.filterPriceFrom
-        || this.filters.filterPriceTo
-        || this.filters.filterCategoryId
-        || this.filters.filterColorId.length
-        || this.filters.filterMaterialId.length
-        || this.filters.filterSeasonId.length
+      return Object.values(this.filters).some(filter => filter.length !== undefined ? filter.length : filter);
     }
   },
   methods: {

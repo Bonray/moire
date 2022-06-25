@@ -94,36 +94,18 @@
       <div class="item__desc">
         <ul class="tabs">
           <li class="tabs__item">
-            <a class="tabs__link tabs__link--current">
+            <a class="tabs__link" :class="{'tabs__link--current': selectedTab === 'base-item-content'}" @click="setSelectedComponent('base-item-content')">
               Информация о товаре
             </a>
           </li>
           <li class="tabs__item">
-            <a class="tabs__link" href="#">
+            <a class="tabs__link" :class="{'tabs__link--current': selectedTab === 'base-item-delivery'}" @click="setSelectedComponent('base-item-delivery')">
               Доставка и возврат
             </a>
           </li>
         </ul>
-
-        <div class="item__content">
-          <h3>Состав:</h3>
-          
-          <p>
-            60% хлопок<br>
-            30% полиэстер<br>
-          </p>
         
-          <h3>Уход:</h3>
-
-          <p>
-            Машинная стирка при макс. 30ºC короткий отжим<br>
-            Гладить при макс. 110ºC<br>
-            Не использовать машинную сушку<br>
-            Отбеливать запрещено<br>
-            Не подвергать химчистке<br>
-          </p>
-  
-        </div>
+        <component :is="selectedTab"></component>
       </div>
     </section>
   </main> 
@@ -133,9 +115,11 @@
 import axios from 'axios';
 import { API_URL } from '@/config.js';
 import BaseItemCounter from '@/components/BaseItemCounter.vue';
+import BaseItemContent from '@/components/BaseItemContent.vue';
+import BaseItemDelivery from '@/components/BaseItemDelivery.vue';
 
 export default {
-  components: { BaseItemCounter },
+  components: { BaseItemCounter, BaseItemContent, BaseItemDelivery },
   data() {
     return {
       productAmount: 1,
@@ -147,6 +131,7 @@ export default {
       productData: null,
       activeColorIdx: 0,
       activeSizeIdx: 0,
+      selectedTab: 'base-item-content',
     }
   },
   computed: {
@@ -219,6 +204,9 @@ export default {
       }
       this.isSending = false;
       this.isAdded = true;
+    },
+    setSelectedComponent(val) {
+      this.selectedTab = val;
     }
   },
   created() {

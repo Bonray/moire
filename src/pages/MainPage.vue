@@ -105,7 +105,7 @@ export default {
     }
   },
   created() {
-    this.$route.query.categoryId ? this.filters.filterCategoryId = this.$route.query.categoryId : 0;
+    this.filters.filterCategoryId = this.$route.query.categoryId || 0;
     this.loadProducts();
   }
 }
