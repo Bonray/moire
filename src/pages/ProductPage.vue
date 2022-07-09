@@ -136,12 +136,14 @@ export default {
   },
   computed: {
     product() {
+      console.log(this.productData);
       return {
         ...this.productData,
         gallery: this.productData.colors.map(color => {
+          // console.log(color);
           return {
             id: color.color.id,
-            image: color.gallery[0].file.url
+            image: color.gallery ? color.gallery[0].file.url : 'https://westsiderc.org/wp-content/uploads/2019/08/Image-Not-Available.png'
           }
         })
       };
@@ -174,6 +176,7 @@ export default {
       this.isLoadingFailed = false;
       try {
         const { data } = await axios.get(`${API_URL}/products/${this.$route.params.id}`);
+        console.log(data);
         this.productData = data;
       } catch(err) {
         this.isLoading = false;
