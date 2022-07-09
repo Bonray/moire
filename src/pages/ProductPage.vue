@@ -140,7 +140,6 @@ export default {
       return {
         ...this.productData,
         gallery: this.productData.colors.map(color => {
-          // console.log(color);
           return {
             id: color.color.id,
             image: color.gallery ? color.gallery[0].file.url : 'https://westsiderc.org/wp-content/uploads/2019/08/Image-Not-Available.png'
