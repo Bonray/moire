@@ -136,7 +136,6 @@ export default {
   },
   computed: {
     product() {
-      console.log(this.productData);
       return {
         ...this.productData,
         gallery: this.productData.colors.map(color => {
